@@ -6,19 +6,22 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'sonner'
+import { useDispatch } from 'react-redux'
+import { setUser } from '@/redux/authSlice'
 
 const Login = () => {
 
     const navigate = useNavigate()
+    const dispatch = useDispatch()
 
-    const [user, setUser] = useState({
+    const [input, setInput] = useState({
         email: '',
         password: ""
     })
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setUser((prev) => ({
+        setInput((prev) => ({
             ...prev,
             [name]: value,
         }))
@@ -26,8 +29,10 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log(input);
+        
         try {
-            const response = await axios.post('http://localhost:8000/api/v1/user/login' , user , {
+            const response = await axios.post('http://localhost:8000/api/v1/user/login' , input , {
                 headers:{
                     "Content-Type":"application/json"
                 },
@@ -36,6 +41,7 @@ const Login = () => {
 
             if(response.data.success){
                 navigate('/')
+                dispatch(setUser(response.data.user))
                 toast.success(response.data.message)
             }
             else{
@@ -60,7 +66,7 @@ const Login = () => {
                     placeholder="Enter Your Email" 
                     name='email' 
                     type='email'
-                    value={user.email} 
+                    value={input.email} 
                     onChange={handleChange} 
                     className='mt-2' 
                     />
@@ -72,7 +78,7 @@ const Login = () => {
                     className='mt-2'
                     name='password'
                     type='password' 
-                    value={user.password} 
+                    value={input.password} 
                     onChange={handleChange} 
                     />
                 </div>
